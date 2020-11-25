@@ -1,0 +1,75 @@
+- name: Tap non-official brew repositories
+  community.general.homebrew_tap:
+    name: heroku/brew
+
+- name: Install brew packages
+  community.general.homebrew:
+    name:
+      - git
+      - zsh
+      - tmux
+      - tmate
+      - neovim
+      - httpie
+      - neovim
+      - rbenv
+      - python
+      - iproute2mac
+      - heroku
+    state: present
+
+- name: Install tmux plugin manager
+  git:
+    repo: https://github.com/tmux-plugins/tpm
+    dest: ~/.tmux/plugins/tpm
+
+- name: Check neovim python 3 module is present
+  command: pip3 show pynvim
+  ignore_errors: true
+  register: result
+
+- name: Install neovim python 3 module
+  command: pip3 install --user --upgrade pynvim
+  when: result is failed
+
+- name: Check neovim-remote is present
+  command: pip3 show neovim-remote
+  ignore_errors: true
+  register: result
+
+- name: Install neovim-remote
+  command: pip3 install neovim-remote
+  when: result is failed
+
+- name: Adds oh-my-zsh
+  git:
+    repo: https://github.com/robbyrussell/oh-my-zsh.git
+    dest: ~/.oh-my-zsh
+
+- name: Install ngrok
+  become: yes
+  unarchive:
+    src: https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-darwin-amd64.zip
+    dest: /usr/local/bin
+    remote_src: yes
+    mode: '555'
+
+- name: Check mspack is present
+  command: pip show msgpack
+  ignore_errors: true
+  register: result
+
+- name: Install msgpack (deoplete dependency)
+  command: pip install msgpack
+  when: result is failed
+
+- name: Install nvm
+  shell: >
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.36.0/install.sh | bash
+  args:
+    creates: "{{ ansible_env.HOME }}/.nvm/nvm.sh"
+
+- name: Install Docker
+  community.general.homebrew_cask:
+    name: docker
+    state: present

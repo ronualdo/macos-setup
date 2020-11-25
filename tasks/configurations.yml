@@ -1,0 +1,78 @@
+- name: Creates workspace folder
+  file:
+    name: "{{ workspace_folder }}"
+    state: directory
+    mode: '0755'
+    owner: "{{ user }}"
+ 
+- name: Retrieving configuration
+  git:
+    repo: https://github.com/ronualdo/dotfiles.git
+    dest: "{{ workspace_folder }}/dotfiles"
+
+- name: Sets up git
+  file:
+    src: "{{ workspace_folder }}/dotfiles/.gitconfig"
+    dest: "~/.gitconfig"
+    state: link
+    owner: "{{ user }}"
+    force: true
+
+- name: Create .config directory if it does not exist
+  file:
+    path: ~/.config
+    state: directory
+    mode: '0755'
+
+- name: Sets up nvim config
+  file:
+    src: "{{ workspace_folder }}/dotfiles/nvim/"
+    dest: "~/.config/nvim"
+    state: link
+    owner: "{{ user }}"
+    force: true
+
+- name: Install nvim plugins
+  command: nvim --headless +PlugInstall +qa
+
+- name: Sets up tmux
+  file:
+    src: "{{ workspace_folder }}/dotfiles/.tmux.conf"
+    dest: "~/.tmux.conf"
+    state: link
+    owner: "{{ user }}"
+    force: true
+
+- name: Sets up zshrc
+  file:
+    src: "{{ workspace_folder }}/dotfiles/.zshrc"
+    dest: "~/.zshrc"
+    state: link
+    owner: "{{ user }}"
+    force: true
+
+- name: Sets up zshrc functions
+  file:
+    src: "{{ workspace_folder }}/dotfiles/functions"
+    dest: "~/functions"
+    state: link
+    owner: "{{ user }}"
+    force: true
+
+- name: Sets up zsh custom
+  file:
+    src: "{{ workspace_folder }}/dotfiles/zsh_custom"
+    dest: "~/zsh_custom"
+    state: link
+    owner: "{{ user }}"
+    force: true
+
+- name: Sets up ohmyzsh autosuggestions
+  git:
+    repo: https://github.com/zsh-users/zsh-autosuggestions
+    dest: "~/zsh_custom/plugins/zsh-autosuggestions"
+
+- name: Sets up ohmyzsh syntax highlight
+  git:
+    repo: https://github.com/zsh-users/zsh-syntax-highlighting.git
+    dest: "~/zsh_custom/plugins/zsh-syntax-highlighting"

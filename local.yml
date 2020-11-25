@@ -1,0 +1,7 @@
+- hosts: localhost
+  vars_files:
+    - ~/.setup_vars.yml
+  become_user: "{{ user }}"
+  tasks:
+    - include: tasks/install_packages.yml
+    - include: tasks/configurations.yml
